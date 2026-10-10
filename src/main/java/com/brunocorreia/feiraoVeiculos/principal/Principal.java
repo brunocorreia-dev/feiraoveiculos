@@ -1,6 +1,7 @@
 package com.brunocorreia.feiraoVeiculos.principal;
 
 import com.brunocorreia.feiraoVeiculos.model.Dados;
+import com.brunocorreia.feiraoVeiculos.model.DadosVeiculos;
 import com.brunocorreia.feiraoVeiculos.model.Modelos;
 import com.brunocorreia.feiraoVeiculos.model.TipoVeiculo;
 import com.brunocorreia.feiraoVeiculos.services.BuscaDados;
@@ -39,6 +40,9 @@ public class Principal {
             return;
         }
         Dados modelo = escolherOpcao("modelo", modelos);
+
+        String enderecoAnos = enderecoModelos + "/" + modelo.codigo() + "/anos";
+        List<DadosVeiculos> veiculos = buscarVeiculos(enderecoAnos, buscarLista(enderecoAnos));
     }
 
     // ---------- Busca de dados ----------
@@ -51,6 +55,13 @@ public class Principal {
     private List<Dados> buscarModelos(String endereco) {
         String json = consumo.buscaDados(endereco);
         return conversor.converteDados(json, Modelos.class).modelos();
+    }
+
+    private List<DadosVeiculos> buscarVeiculos(String enderecoAnos, List<Dados> anos) {
+        return anos.stream()
+                .map(ano -> conversor.converteDados(
+                        consumo.buscaDados(enderecoAnos + "/" + ano.codigo()), DadosVeiculos.class))
+                .toList();
     }
 
     // ---------- Leitura do usuário ----------
