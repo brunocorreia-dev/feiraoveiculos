@@ -20,10 +20,6 @@ public class Principal {
     private final BuscaDados consumo = new BuscaDados();
     private final ConversorDados conversor = new ConversorDados();
 
-    public static void main(String[] args) {
-        new Principal().exibeMenu();
-    }
-
     public void exibeMenu() {
         TipoVeiculo tipo = lerTipoVeiculo();
         String enderecoMarcas = ENDERECO + tipo.getCaminho() + "/marcas";
