@@ -1,9 +1,13 @@
 package com.brunocorreia.feiraoVeiculos.principal;
 
+import com.brunocorreia.feiraoVeiculos.model.Dados;
 import com.brunocorreia.feiraoVeiculos.model.TipoVeiculo;
 import com.brunocorreia.feiraoVeiculos.services.BuscaDados;
 import com.brunocorreia.feiraoVeiculos.services.ConversorDados;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -21,6 +25,17 @@ public class Principal {
     public void exibeMenu() {
         TipoVeiculo tipo = lerTipoVeiculo();
         String enderecoMarcas = ENDERECO + tipo.getCaminho() + "/marcas";
+
+        List<Dados> marcas = buscarLista(enderecoMarcas);
+        exibirOpcoes("Marcas de " + tipo.getDescricao(), marcas);
+        Dados marca = escolherOpcao("marca", marcas);
+    }
+
+    // ---------- Busca de dados ----------
+
+    private List<Dados> buscarLista(String endereco) {
+        String json = consumo.buscaDados(endereco);
+        return conversor.converteLista(json, Dados.class);
     }
 
     // ---------- Leitura do usuário ----------
@@ -42,6 +57,29 @@ public class Principal {
             }
             System.out.println("Opção inválida.");
         }
+    }
+
+    private Dados escolherOpcao(String rotulo, List<Dados> opcoes) {
+        while (true) {
+            System.out.println("Digite o código do(a) " + rotulo + ": ");
+            String codigo = leitura.nextLine().trim();
+            Optional<Dados> escolhida = opcoes.stream()
+                    .filter(d -> d.codigo().equals(codigo))
+                    .findFirst();
+            if (escolhida.isPresent()) {
+                return escolhida.get();
+            }
+            System.out.println("Código inválido.");
+        }
+    }
+
+    // ---------- Exibição ----------
+
+    private void exibirOpcoes(String titulo, List<Dados> opcoes) {
+        exibirTitulo(titulo);
+        opcoes.stream()
+                .sorted(Comparator.comparing(Dados::nome))
+                .forEach(d -> System.out.printf("  %6s - %s%n", d.codigo(), d.nome()));
     }
 
     // ---------- Formatação ----------
