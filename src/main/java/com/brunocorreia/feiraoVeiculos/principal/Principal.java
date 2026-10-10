@@ -43,6 +43,8 @@ public class Principal {
 
         String enderecoAnos = enderecoModelos + "/" + modelo.codigo() + "/anos";
         List<DadosVeiculos> veiculos = buscarVeiculos(enderecoAnos, buscarLista(enderecoAnos));
+
+        exibirVeiculos(modelo, veiculos);
     }
 
     // ---------- Busca de dados ----------
@@ -114,6 +116,12 @@ public class Principal {
         opcoes.stream()
                 .sorted(Comparator.comparing(Dados::nome))
                 .forEach(d -> System.out.printf("  %6s - %s%n", d.codigo(), d.nome()));
+    }
+
+    private void exibirVeiculos(Dados modelo, List<DadosVeiculos> veiculos) {
+        exibirTitulo("Valores FIPE - " + modelo.nome());
+        veiculos.forEach(v -> System.out.printf("  %4d | %-10s | %-15s | FIPE %s | %s%n",
+                v.ano(), v.combustivel(), v.valor(), v.codigoFipe(), v.mesReferencia()));
     }
 
     // ---------- Formatação ----------
