@@ -1,6 +1,7 @@
 package com.brunocorreia.feiraoVeiculos.principal;
 
 import com.brunocorreia.feiraoVeiculos.model.Dados;
+import com.brunocorreia.feiraoVeiculos.model.Modelos;
 import com.brunocorreia.feiraoVeiculos.model.TipoVeiculo;
 import com.brunocorreia.feiraoVeiculos.services.BuscaDados;
 import com.brunocorreia.feiraoVeiculos.services.ConversorDados;
@@ -29,6 +30,15 @@ public class Principal {
         List<Dados> marcas = buscarLista(enderecoMarcas);
         exibirOpcoes("Marcas de " + tipo.getDescricao(), marcas);
         Dados marca = escolherOpcao("marca", marcas);
+
+        String enderecoModelos = enderecoMarcas + "/" + marca.codigo() + "/modelos";
+        List<Dados> modelos = filtrarPorNome(buscarModelos(enderecoModelos));
+        exibirOpcoes("Modelos de " + marca.nome(), modelos);
+        if (modelos.isEmpty()) {
+            System.out.println("Nenhum modelo encontrado.");
+            return;
+        }
+        Dados modelo = escolherOpcao("modelo", modelos);
     }
 
     // ---------- Busca de dados ----------
@@ -36,6 +46,11 @@ public class Principal {
     private List<Dados> buscarLista(String endereco) {
         String json = consumo.buscaDados(endereco);
         return conversor.converteLista(json, Dados.class);
+    }
+
+    private List<Dados> buscarModelos(String endereco) {
+        String json = consumo.buscaDados(endereco);
+        return conversor.converteDados(json, Modelos.class).modelos();
     }
 
     // ---------- Leitura do usuário ----------
@@ -71,6 +86,14 @@ public class Principal {
             }
             System.out.println("Código inválido.");
         }
+    }
+
+    private List<Dados> filtrarPorNome(List<Dados> opcoes) {
+        System.out.println("Digite um trecho do nome do modelo (ou Enter para listar todos): ");
+        String trecho = leitura.nextLine().trim().toLowerCase();
+        return opcoes.stream()
+                .filter(d -> d.nome().toLowerCase().contains(trecho))
+                .toList();
     }
 
     // ---------- Exibição ----------
